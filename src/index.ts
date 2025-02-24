@@ -2,12 +2,10 @@ import express from 'express';
 import userRouter from './routes/user';
 import userContent from './routes/content';
 import brainRouter from './routes/brain';
-import { config } from 'dotenv';
 import connectdb from './db/db';
 import cors from 'cors';
+import 'dotenv/config'
 
-config(); 
-console.log("hello");
 
 const app = express();
 app.use(cors());

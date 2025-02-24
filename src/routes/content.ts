@@ -5,7 +5,7 @@ import userAuth from "../middleware/userAuthMiddleware";
 
 router.post('/uploadContent',userAuth,contentController.uploadContent)
 
-router.get('/content',userAuth, contentController.getContent);
+router.get('/allcontent',userAuth, contentController.getContent);
 
 router.delete('/delete',userAuth , contentController.deleteContent);
 
