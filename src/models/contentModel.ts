@@ -1,4 +1,5 @@
 import mongoose, { Types } from "mongoose"
+import { string } from "zod";
 const contentTypes  = ['images','video','article','audio']
 
 const contentSchema = new mongoose.Schema({

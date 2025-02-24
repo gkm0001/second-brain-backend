@@ -28,7 +28,6 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<any> => {
     const { link, type, title, tags } = parseDataWithSuccess.data;
     try {
         
-       
         const content = new contentModel({
             link,
             type,
