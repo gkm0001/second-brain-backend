@@ -1,6 +1,5 @@
 import mongoose, { Types } from "mongoose"
-import { string } from "zod";
-const contentTypes  = ['images','video','article','audio']
+export const contentTypes  = ['images','video','article','audio','youtube','twitter','linkedin'] as const
 
 const contentSchema = new mongoose.Schema({
     link: {
@@ -17,11 +16,11 @@ const contentSchema = new mongoose.Schema({
          required: true 
      },
    tags: [{ 
-         type: mongoose.Types.ObjectId, 
+         type: mongoose.Schema.Types.ObjectId, 
          ref: 'Tag' 
          }],
    userId: { 
-         type: mongoose.Types.ObjectId, 
+         type: mongoose.Schema.Types.ObjectId, 
          ref: 'User', 
          required: true 
           },
