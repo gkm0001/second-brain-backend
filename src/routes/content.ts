@@ -7,6 +7,6 @@ router.post('/uploadcontent',userAuth,contentController.uploadContent)
 
 router.get('/allcontent',userAuth, contentController.getContent);
 
-router.delete('/delete',userAuth , contentController.deleteContent);
+router.post('/delete',userAuth , contentController.deleteContent);
 
 export default router

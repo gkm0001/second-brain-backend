@@ -1,4 +1,5 @@
 import mongoose, { Types } from "mongoose"
+import { string } from "zod";
 export const contentTypes  = ['images','video','article','audio','youtube','twitter','linkedin'] as const
 
 const contentSchema = new mongoose.Schema({
@@ -10,6 +11,9 @@ const contentSchema = new mongoose.Schema({
         type: String, 
         enum: contentTypes, 
         required: true 
+     },
+     text : {
+       type : String,
      },
    title: { 
          type: String, 

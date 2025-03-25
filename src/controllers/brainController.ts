@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import linkModel from "../models/linkModel";
 // import type { AuthRequest } from "./contentController";
-import { random } from "../utils/utils";
+import { random } from "../utils/random";
 import contentModel from "../models/contentModel";
 import userModel from "../models/userModel";
 

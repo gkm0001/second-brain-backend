@@ -15,6 +15,7 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
     const requiredBody = z.object({
         link: z.string().url({ message: 'Invalid url' }),
         type: z.enum(contentTypes),
+        text : z.string().optional(),
         title: z.string().min(1, { message: 'Title is required' }),
         tags: z.array(z.string()).optional(),
     });
@@ -30,7 +31,7 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
         return;
     }
 
-    const { link, type, title, tags } = parseDataWithSuccess.data;
+    const { link, type, title, tags ,text} = parseDataWithSuccess.data;
     // console.log({link , type , title});
     try {
         
@@ -39,6 +40,7 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
             type,
             title,
             tags: [], // Convert tags to ObjectId
+            text,
             userId: req.userId
         });
 
@@ -72,16 +74,22 @@ const getContent = async(req :AuthRequest , res : Response) : Promise<void>=> {
 
 const deleteContent = async(req:AuthRequest,res:Response) : Promise<void>=> {
      const contentId = req.body.contentId;
-     
-     await contentModel.deleteOne({
-           contentId,
-           userId : req.userId
-     })
+     console.log("hi",contentId);
 
-     res.json({
-           message : 'Deleted'
-     })
-     return;
+     try {
+        await contentModel.deleteOne({
+            _id : contentId,
+            userId : req.userId
+      })
+        res.json({
+                message : 'Deleted'
+        })
+        return ;
+
+     }catch(error){
+        console.error("Error while deleting the content")
+     }
+     
 };
 
 export { uploadContent, getContent, deleteContent };

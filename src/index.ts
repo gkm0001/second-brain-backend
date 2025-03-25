@@ -18,6 +18,10 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/content', userContent);
 app.use('/api/v1/brain', brainRouter);
 
+//Social Media post text and username 
+// app.use('/api/v1/social-media', socialMediaRoutes);
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
