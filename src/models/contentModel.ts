@@ -1,11 +1,10 @@
 import mongoose, { Types } from "mongoose"
 import { string } from "zod";
-export const contentTypes  = ['images','video','article','audio','youtube','twitter','linkedin'] as const
+export const contentTypes  = ['images','video','article','audio','youtube','twitter','linkedin', 'other'] as const
 
 const contentSchema = new mongoose.Schema({
     link: {
         type: String,
-       required: true
      },
     type: { 
         type: String, 

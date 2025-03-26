@@ -13,8 +13,8 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
     console.log(req.body);
 
     const requiredBody = z.object({
-        link: z.string().url({ message: 'Invalid url' }),
-        type: z.enum(contentTypes),
+        link: z.string().optional(),
+        type: z.enum(contentTypes).optional(),
         text : z.string().optional(),
         title: z.string().min(1, { message: 'Title is required' }),
         tags: z.array(z.string()).optional(),
