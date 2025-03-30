@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import mongoose from "mongoose";
 import contentModel, { contentTypes } from "../models/contentModel";
+import { addTodo, getChatGptResponse, searchSimilarTodos } from "../utils/vectorEmbedding";
 
 
 export interface AuthRequest extends Request {
@@ -45,6 +46,11 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
         });
 
         await content.save();
+        if (text) {
+             // Corrected the syntax: now userId is passed inside an options object.
+            await addTodo(text,  req.userId as string);  
+        }
+        
          res.status(200).json({ message: 'Content saved successfully' });
          return;
     } catch (error : any) {
@@ -72,6 +78,20 @@ const getContent = async(req :AuthRequest , res : Response) : Promise<void>=> {
      }
 };
 
+const searchAndQueryText = async(req : AuthRequest , res: Response) : Promise<void> => {
+     const content = req.body.text;
+     const userId = req.userId;
+     try{
+        const data=  await getChatGptResponse(content , userId as string);
+         res.status(200).json({message : data})
+         return ;
+
+     }catch(error){
+        res.status(401).json({message : error})
+        return ;
+     }
+}
+
 const deleteContent = async(req:AuthRequest,res:Response) : Promise<void>=> {
      const contentId = req.body.contentId;
      console.log("hi",contentId);
@@ -92,5 +112,5 @@ const deleteContent = async(req:AuthRequest,res:Response) : Promise<void>=> {
      
 };
 
-export { uploadContent, getContent, deleteContent };
+export { uploadContent, getContent, deleteContent , searchAndQueryText };
 

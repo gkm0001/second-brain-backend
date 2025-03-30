@@ -9,4 +9,6 @@ router.get('/allcontent',userAuth, contentController.getContent);
 
 router.post('/delete',userAuth , contentController.deleteContent);
 
+router.post('/search', userAuth , contentController.searchAndQueryText);
+
 export default router
