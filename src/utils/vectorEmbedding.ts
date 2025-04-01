@@ -1,18 +1,17 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
+import { OPENAI_API_KEY, PINECONE_API_KEY } from "./key";
 
 const INDEX_NAME = 'index';
 
 // Initialize Pinecone and OpenAI clients with your API keys
-export const pinecone = new Pinecone({ 
-  apiKey: process.env.PINECONE_API_KEY as string
-});
-console.log(process.env.PINECONE_API_KEY as string);
-console.log(process.env.OPENAI_API_KEY);
+export const pinecone = new Pinecone({ apiKey: PINECONE_API_KEY});
+console.log(PINECONE_API_KEY);
+console.log(OPENAI_API_KEY);
 
 
 export const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: OPENAI_API_KEY
 });
 
 // Check if the index exists
