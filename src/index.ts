@@ -18,6 +18,11 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/content', userContent);
 app.use('/api/v1/brain', brainRouter);
 
+// Health check endpoint
+app.get('/health', (req : any, res :any) => res.sendStatus(200));
+
+
+
 //Social Media post text and username 
 // app.use('/api/v1/social-media', socialMediaRoutes);
 
