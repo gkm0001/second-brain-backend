@@ -9,6 +9,7 @@ export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+export const HOST_NAME = process.env.HOST_NAME as string
 // Check if the index exists
 export const indexExists = async () => {
     try {
@@ -49,7 +50,7 @@ export const indexExists = async () => {
       console.log("Index does not exist. Creating index programmatically...");
       await createDatabase();
     }
-    return pinecone.Index(INDEX_NAME);
+    return pinecone.Index(INDEX_NAME ,HOST_NAME);
   };
   
   // Use the OpenAI model to generate vector embeddings
@@ -58,19 +59,16 @@ export const indexExists = async () => {
       model: "text-embedding-ada-002",
       input: text,
     });
-    // console.log(response.data);
-    // console.log(response.data[0])
-    // console.log(response.data[0].embedding)
     
     return response.data[0].embedding;
   }
   
   // Add a todo item to the Pinecone index with associated userId
-  export const addTodo = async (text: string, userId: string) => {
+  export const addTodo = async (text: string, userId: string , contentId : any) => {
     try {
       const todoId = Date.now().toString();
       const embedding = await generateEmbedding(text);
-      const metadata = { text, userId };
+      const metadata = { text, userId , contentId};
   
       const pineconeIndex = await getPineconeIndex();
       await pineconeIndex.namespace('ns1').upsert([
@@ -151,3 +149,42 @@ export const indexExists = async () => {
       throw error;
     }
   };
+
+  export const deleteResponse = async ( userId: string, contentId: any) => {
+    try {
+
+      const pineconeIndex = await getPineconeIndex();
+
+      // Create a dummy vector matching the expected dimension.
+      // For instance, text-embedding-ada-002 returns 1536-dimensional vectors.
+      const dummyVector = new Array(1536).fill(0);
+  
+      // First, query the index to get the vector(s) that match the metadata filter.
+      const queryResponse = await pineconeIndex.namespace('ns1').query({
+        vector: dummyVector,
+        filter: { userId, contentId },
+        topK: 1,            // assume we want the first match
+        includeMetadata: false,
+      });
+  
+      if (!queryResponse.matches || queryResponse.matches.length === 0) {
+        console.log("No matching vector found for deletion.");
+        return { status: 404, message: "No matching vector found" };
+      }
+  
+      // Extract the id of the vector to delete.
+      const idToDelete = queryResponse.matches[0].id;
+
+      console.log(idToDelete);
+
+      // The Pinecone API deletion method typically requires an array of ids.
+       await pineconeIndex.namespace('ns1').deleteOne(idToDelete)
+  
+      console.log("Delete operation completed successfully.");
+      return { status: 200, message: "Deletion successful" };
+    } catch (error) {
+      console.error("Error deleting data:", error);
+      throw error;
+    }
+  };
+  

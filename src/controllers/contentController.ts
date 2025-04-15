@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { z } from "zod";
 import mongoose from "mongoose";
 import contentModel, { contentTypes } from "../models/contentModel";
-import { addTodo, getChatGptResponse, searchSimilarTodos } from "../utils/vectorEmbedding";
+import { addTodo, deleteResponse, getChatGptResponse, searchSimilarTodos } from "../utils/vectorEmbedding";
 
 
 export interface AuthRequest extends Request {
@@ -33,7 +33,7 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
     }
 
     const { link, type, title, tags ,text} = parseDataWithSuccess.data;
-    // console.log({link , type , title});
+     console.log({link , type ,text,  title});
     try {
         
         const content = new contentModel({
@@ -45,10 +45,12 @@ const uploadContent = async (req: AuthRequest, res: Response): Promise<void> => 
             userId: req.userId
         });
 
-        await content.save();
+        const savedContent = await content.save();
+        const contentId = savedContent._id;
         if (text) {
              // Corrected the syntax: now userId is passed inside an options object.
-            await addTodo(text,  req.userId as string);  
+            
+            await addTodo(text,  req.userId as string, contentId as any);  
         }
         
          res.status(200).json({ message: 'Content saved successfully' });
@@ -95,20 +97,36 @@ const searchAndQueryText = async(req : AuthRequest , res: Response) : Promise<vo
 const deleteContent = async(req:AuthRequest,res:Response) : Promise<void>=> {
      const contentId = req.body.contentId;
      console.log("hi",contentId);
+     console.log(typeof contentId);
+     
 
      try {
-        await contentModel.deleteOne({
-            _id : contentId,
-            userId : req.userId
-      })
+        // First, delete the content from your database.
+        const deletionResult = await contentModel.deleteOne({
+          _id: contentId,
+          userId: req.userId,
+        });
+    
+        if (!deletionResult.deletedCount) {
+          res.status(404).json({
+            message: "Content not found or not authorized",
+          });
+          return;
+        }
+    
+        // After successfully deleting from the DB, call the Pinecone deletion function.
+        // The deleteResponse function queries Pinecone using a dummy vector,
+        // extracts the corresponding vector's id using metadata filter,
+        // and then deletes it from the index.
+        await deleteResponse( req.userId as string, contentId);
+    
         res.json({
-                message : 'Deleted'
-        })
-        return ;
-
-     }catch(error){
-        console.error("Error while deleting the content")
-     }
+          message: "Deleted successfully",
+        });
+      } catch (error) {
+        console.error("Error while deleting the content:", error);
+        res.status(500).json({ message: "Failed to delete content." });
+      }
      
 };
 
